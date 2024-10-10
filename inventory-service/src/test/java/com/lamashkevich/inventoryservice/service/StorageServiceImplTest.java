@@ -3,6 +3,7 @@ package com.lamashkevich.inventoryservice.service;
 import com.lamashkevich.inventoryservice.TestcontainersInit;
 import com.lamashkevich.inventoryservice.dto.CreateStorageDto;
 import com.lamashkevich.inventoryservice.dto.StorageDto;
+import com.lamashkevich.inventoryservice.entity.Storage;
 import com.lamashkevich.inventoryservice.exception.StorageNotFoundException;
 import com.lamashkevich.inventoryservice.repository.StorageRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,26 +34,32 @@ class StorageServiceImplTest extends TestcontainersInit {
 
     @Test
     public void getById_ShouldReturnStorage() {
-        var createStorageDto = new CreateStorageDto("Storage 1", "Location 1");
-        StorageDto createdStorage = storageService.create(createStorageDto);
+        Storage storage = saveStorage("Storage", "Location");
 
-        StorageDto fetchedStorage = storageService.getById(createdStorage.id());
+        StorageDto fetchedStorage = storageService.getById(storage.getId());
 
         assertNotNull(fetchedStorage);
-        assertEquals(createdStorage.id(), fetchedStorage.id());
-        assertEquals(createStorageDto.name(), fetchedStorage.name());
+        assertEquals(storage.getId(), fetchedStorage.id());
+        assertEquals(storage.getName(), fetchedStorage.name());
+    }
+
+    @Test
+    public void getById_ThrowStorageNotFoundException_WhenStorageDoesNotExist() {
+        assertThrows(StorageNotFoundException.class, () -> storageService.getById(Long.MAX_VALUE));
     }
 
     @Test
     public void getAll_ShouldReturnAllStorages() {
-        var dto1 = new CreateStorageDto("Storage 1", "Location 1");
-        var dto2 = new CreateStorageDto("Storage 2", "Location 2");
-        storageService.create(dto1);
-        storageService.create(dto2);
+        Storage storage1 = saveStorage("Storage 1", "Location 1");
+        Storage storage2 = saveStorage("Storage 2", "Location 2");
 
         List<StorageDto> storages = storageService.getAll();
 
         assertEquals(2, storages.size());
+        assertEquals(storage1.getName(), storages.get(0).name());
+        assertEquals(storage1.getLocation(), storages.get(0).location());
+        assertEquals(storage2.getName(), storages.get(1).name());
+        assertEquals(storage2.getLocation(), storages.get(1).location());
     }
 
     @Test
@@ -69,14 +76,13 @@ class StorageServiceImplTest extends TestcontainersInit {
 
     @Test
     public void update_ShouldUpdateAndReturnUpdatedStorage() {
-        CreateStorageDto createStorageDto = new CreateStorageDto("Storage 1", "Location");
-        StorageDto createdStorage = storageService.create(createStorageDto);
+        Storage storage = saveStorage("Storage", "Location");
 
         CreateStorageDto updateDto = new CreateStorageDto("Storage 2", "Location 2");
-        StorageDto updatedStorage = storageService.update(createdStorage.id(), updateDto);
+        StorageDto updatedStorage = storageService.update(storage.getId(), updateDto);
 
         assertNotNull(updatedStorage);
-        assertEquals(createdStorage.id(), updatedStorage.id());
+        assertEquals(storage.getId(), updatedStorage.id());
         assertEquals("Storage 2", updatedStorage.name());
         assertEquals("Location 2", updatedStorage.location());
     }
@@ -84,9 +90,11 @@ class StorageServiceImplTest extends TestcontainersInit {
     @Test
     public void update_ShouldThrowStorageNotFoundException_WhenStorageDoesNotExist() {
         var updateDto = new CreateStorageDto("Storage", "Location");
+        assertThrows(StorageNotFoundException.class, () -> storageService.update(Long.MAX_VALUE, updateDto));
+    }
 
-        assertThrows(StorageNotFoundException.class, () -> {
-            storageService.update(Long.MAX_VALUE, updateDto);
-        });
+    private Storage saveStorage(String name, String location) {
+        Storage storage = Storage.builder().name(name).location(location).build();
+        return storageRepository.save(storage);
     }
 }
