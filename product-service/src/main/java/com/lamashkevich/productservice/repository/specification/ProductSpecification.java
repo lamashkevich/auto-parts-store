@@ -41,4 +41,10 @@ public class ProductSpecification {
         };
     }
 
+    public static Specification<Product> filterByQuery(String query) {
+        return hasBrand(query)
+                .or(hasCode(query))
+                .or(hasName(query))
+                .or(hasDescription(query));
+    }
 }

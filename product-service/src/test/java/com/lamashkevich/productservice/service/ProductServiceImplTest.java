@@ -2,6 +2,7 @@ package com.lamashkevich.productservice.service;
 
 import com.lamashkevich.productservice.dto.CreateProductDto;
 import com.lamashkevich.productservice.dto.ProductDto;
+import com.lamashkevich.productservice.dto.SearchFilter;
 import com.lamashkevich.productservice.entity.Product;
 import com.lamashkevich.productservice.exception.ProductNotFoundException;
 import com.lamashkevich.productservice.repository.ProductRepository;
@@ -16,6 +17,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +82,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void search_ShouldReturnProductSlice() {
+    public void searchWithPagination_ShouldReturnProductSlice() {
         String query = "query";
         int page = 0;
         int size = 4;
@@ -90,7 +93,7 @@ public class ProductServiceImplTest {
         saveProduct("code4", "brand4", "nameQuery4", "description4");
         saveProduct("code5", "brand5", "nameQuery5", "descriptionQUERY5");
 
-        Slice<ProductDto> slice = productService.search(query, page, size);
+        Slice<ProductDto> slice = productService.searchWithPagination(query, page, size);
 
         assertNotNull(slice);
         assertTrue(slice.isLast());
@@ -98,9 +101,9 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void search_ShouldThrowIllegalArgumentException_WhenSizeOrPageValueIsInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> productService.search("", 0, 0));
-        assertThrows(IllegalArgumentException.class, () -> productService.search("", -1, 1));
+    public void searchWithPagination_ShouldThrowIllegalArgumentException_WhenSizeOrPageValueIsInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> productService.searchWithPagination("", 0, 0));
+        assertThrows(IllegalArgumentException.class, () -> productService.searchWithPagination("", -1, 1));
     }
 
     @Test
@@ -134,7 +137,64 @@ public class ProductServiceImplTest {
 
     @Test
     public void update_ShouldThrowProductNotFoundException_WhenProductDoesNotExist() {
-        assertThrows(ProductNotFoundException.class, () -> productService.update(Long.MAX_VALUE, any(CreateProductDto.class)));
+        assertThrows(ProductNotFoundException.class, () ->
+                productService.update(Long.MAX_VALUE, any(CreateProductDto.class)));
+    }
+
+    @Test
+    public void searchByFilter_ShouldReturnProductList_WhenQueryAndCodeIsEmpty() {
+        saveProduct("code1", "brand", "name1", "description1");
+        saveProduct("code2", "brand", "name2", "description2");
+        saveProduct("code2", "brand", "name3", "description3");
+
+        SearchFilter filter = new SearchFilter("", "code2", "");
+
+        List<ProductDto> searched = productService.searchByFilter(filter);
+
+        assertNotNull(searched);
+        assertEquals(2, searched.size());
+        assertEquals("code2", searched.getFirst().code());
+        assertEquals("brand", searched.getFirst().brand());
+    }
+
+    @Test
+    public void searchByFilter_ShouldReturnProductList_WhenQueryIsPresent() {
+        saveProduct("code1", "brand", "name1", "description1");
+        saveProduct("code2", "brand", "name2", "description2");
+        saveProduct("code2", "brand", "name3", "description3");
+
+        SearchFilter filter = new SearchFilter("3", "code2", "brand");
+
+        List<ProductDto> searched = productService.searchByFilter(filter);
+
+        assertNotNull(searched);
+        assertEquals(1, searched.size());
+        assertEquals("name3", searched.getFirst().name());
+    }
+
+    @Test
+    public void search_ShouldReturnProductList_WhenQueryIsPresent() {
+        saveProduct("code1", "brand", "name1", "description1");
+        saveProduct("code2", "brand", "name2", "description2");
+        saveProduct("code2", "brand", "name3", "description3");
+
+        List<ProductDto> searched = productService.search("3");
+
+        assertNotNull(searched);
+        assertEquals(1, searched.size());
+        assertEquals("name3", searched.getFirst().name());
+    }
+
+    @Test
+    public void search_ShouldReturnProductList_WhenQueryIsEmpty() {
+        saveProduct("code1", "brand", "name1", "description1");
+        saveProduct("code2", "brand", "name2", "description2");
+        saveProduct("code2", "brand", "name3", "description3");
+
+        List<ProductDto> searched = productService.search("");
+
+        assertNotNull(searched);
+        assertEquals(3, searched.size());
     }
 
     private Product saveProduct(String code, String brand, String name, String description) {

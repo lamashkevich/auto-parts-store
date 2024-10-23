@@ -2,11 +2,14 @@ package com.lamashkevich.productservice.controller;
 
 import com.lamashkevich.productservice.dto.CreateProductDto;
 import com.lamashkevich.productservice.dto.ProductDto;
+import com.lamashkevich.productservice.dto.SearchFilter;
 import com.lamashkevich.productservice.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/products")
@@ -16,10 +19,20 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public Slice<ProductDto> searchByQuery(@RequestParam String query,
-                                           @RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size) {
-        return productService.search(query, page, size);
+    public Slice<ProductDto> searchByQueryWithPagination(@RequestParam String query,
+                                                         @RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "10") int size) {
+        return productService.searchWithPagination(query, page, size);
+    }
+
+    @GetMapping("/search")
+    public List<ProductDto> searchByQuery(@RequestParam String query) {
+        return productService.search(query);
+    }
+
+    @PostMapping("/search")
+    public List<ProductDto> searchByFilter(@Valid @RequestBody SearchFilter filter) {
+        return productService.searchByFilter(filter);
     }
 
     @GetMapping("/{id}")
