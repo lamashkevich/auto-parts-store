@@ -9,5 +9,36 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    restart: "no"
+    command:
+      - "start-dev"
+    ports:
+      - "9080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak-postgres
+      DB_USER: keycloak
+      DB_PASSWORD: root
+      DB_DATABASE: keycloak
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+  keycloak-postgres:
+    image: postgres:17.0
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: keycloak
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak" ]
+      interval: 10s
+      retries: 5
 volumes:
   postgres_data:
+  keycloak_postgres_data:
