@@ -1,19 +1,21 @@
 package com.lamashkevich.aggregationservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 import java.util.List;
 
-@SuperBuilder
+@Builder
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product extends ProductInfo {
+public class Product {
+
+    private String code;
+
+    private String brand;
+
+    private String description;
 
     private Boolean isAnalog;
 

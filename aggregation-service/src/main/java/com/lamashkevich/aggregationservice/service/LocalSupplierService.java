@@ -33,7 +33,7 @@ public class LocalSupplierService implements ProductInfoService, SupplierService
     @Override
     public Flux<ProductInfo> findByQuery(String query) {
         return productClient.findProducts(query)
-                .map(this::mapToProduct);
+                .map(this::mapToProductInfo);
     }
 
     @Override
@@ -62,6 +62,14 @@ public class LocalSupplierService implements ProductInfoService, SupplierService
                 .deliveryDate(LocalDateTime.now().plusHours(1))
                 .externalId(localInventory.getId().toString())
                 .multiplicity(1)
+                .build();
+    }
+
+    private ProductInfo mapToProductInfo(LocalProduct localProduct) {
+        return ProductInfo.builder()
+                .code(localProduct.getCode())
+                .brand(localProduct.getBrand())
+                .description(String.format("%s %s", localProduct.getName(), localProduct.getDescription()))
                 .build();
     }
 }

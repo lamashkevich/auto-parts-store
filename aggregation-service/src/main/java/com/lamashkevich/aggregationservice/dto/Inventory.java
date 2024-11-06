@@ -28,4 +28,5 @@ public class Inventory {
 
     private String externalId;
 
+    private String url;
 }

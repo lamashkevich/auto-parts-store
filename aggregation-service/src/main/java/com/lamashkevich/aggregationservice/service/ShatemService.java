@@ -21,6 +21,7 @@ import java.util.List;
 public class ShatemService implements SupplierService, ProductInfoService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final String INVENTORY_URL = "https://shate-m.by/personal/search/part/";
 
     private final ShatemClient shatemClient;
 
@@ -68,6 +69,7 @@ public class ShatemService implements SupplierService, ProductInfoService {
                 .isExternalStorage(price.getType().equals(ArticlePrice.ArticlePriceType.External))
                 .multiplicity(price.getQuantity().multiplicity())
                 .externalId(price.getId())
+                .url(INVENTORY_URL + price.getArticleId())
                 .build();
     }
 
