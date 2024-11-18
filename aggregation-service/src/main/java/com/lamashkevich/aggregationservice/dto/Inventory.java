@@ -14,6 +14,8 @@ public class Inventory {
 
     private BigDecimal price;
 
+    private BigDecimal salePrice;
+
     private Integer quantity;
 
     private LocalDateTime deliveryDate;

@@ -1,10 +1,6 @@
-package com.lamashkevich.productaggregationservice.service;
+package com.lamashkevich.aggregationservice.service;
 
 import com.lamashkevich.aggregationservice.dto.*;
-import com.lamashkevich.aggregationservice.service.LocalSupplierService;
-import com.lamashkevich.aggregationservice.service.ProductAggregationService;
-import com.lamashkevich.aggregationservice.service.ProductInfoService;
-import com.lamashkevich.aggregationservice.service.SupplierService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +38,9 @@ class ProductAggregationServiceTest {
     @Mock
     private LocalSupplierService localService;
 
+    @Mock
+    private MarginService marginService;
+
     private ProductAggregationService productAggregationService;
 
     private Product product1;
@@ -57,7 +56,7 @@ class ProductAggregationServiceTest {
         List<SupplierService> suppliers = List.of(supplierService1, supplierService2);
         List<ProductInfoService> services = List.of(productInfoService1, productInfoService2);
 
-        productAggregationService = new ProductAggregationService(suppliers, services, localService);
+        productAggregationService = new ProductAggregationService(suppliers, services, localService, marginService);
     }
 
     @Test
@@ -119,8 +118,12 @@ class ProductAggregationServiceTest {
 
     @Test
     void findByQuery() {
-        when(productInfoService1.findByQuery(anyString())).thenReturn(Flux.just(product1));
-        when(productInfoService2.findByQuery(anyString())).thenReturn(Flux.just(product2, product3));
+        var productInfo1 = ProductInfo.builder().code("code1").brand("brand").build();
+        var productInfo2 = ProductInfo.builder().code("code1").brand("brand").build();
+        var productInfo3 = ProductInfo.builder().code("code2").brand("brand").build();
+
+        when(productInfoService1.findByQuery(anyString())).thenReturn(Flux.just(productInfo1));
+        when(productInfoService2.findByQuery(anyString())).thenReturn(Flux.just(productInfo2, productInfo3));
 
         Flux<ProductInfo> result = productAggregationService.findByQuery(anyString());
 

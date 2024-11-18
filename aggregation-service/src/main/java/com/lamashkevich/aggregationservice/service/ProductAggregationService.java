@@ -26,6 +26,7 @@ public class ProductAggregationService {
     private final List<SupplierService> suppliers;
     private final List<ProductInfoService> productInfoServices;
     private final LocalSupplierService localService;
+    private final MarginService marginService;
 
     public Flux<Product> findByCodeAndBrand(ProductFilterRequest request) {
         String code = request.getCode();
@@ -42,6 +43,7 @@ public class ProductAggregationService {
                 .filter(product -> !product.getIsAnalog() || !product.getInventories().isEmpty())
                 .sort(sortProducts())
                 .map(this::sortInventories)
+                .map(this::applyMargin)
                 .onErrorResume((error) -> {
                     log.error(error.getMessage());
                     return Flux.empty();
@@ -137,6 +139,15 @@ public class ProductAggregationService {
                 .toList();
 
         product.setInventories(sortedInventories);
+        return product;
+    }
+
+    private Product applyMargin(Product product) {
+        product.getInventories().forEach(inventory -> {
+            log.info(inventory.toString());
+            BigDecimal salePrice = marginService.getPriceWithMargin(inventory.getPrice());
+            inventory.setSalePrice(salePrice);
+        });
         return product;
     }
 
