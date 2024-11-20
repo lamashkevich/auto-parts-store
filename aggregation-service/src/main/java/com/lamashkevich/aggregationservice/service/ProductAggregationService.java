@@ -144,7 +144,6 @@ public class ProductAggregationService {
 
     private Product applyMargin(Product product) {
         product.getInventories().forEach(inventory -> {
-            log.info(inventory.toString());
             BigDecimal salePrice = marginService.getPriceWithMargin(inventory.getPrice());
             inventory.setSalePrice(salePrice);
         });

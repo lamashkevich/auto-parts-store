@@ -14,6 +14,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http) throws Exception {
         return http
                 .authorizeExchange(ex -> ex
+                        .pathMatchers("/api-docs/**", "/webjars/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(configurer -> configurer.jwt(Customizer.withDefaults()))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
