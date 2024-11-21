@@ -19,6 +19,7 @@ public class SecurityConfig {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(configure -> configure
+                        .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(configure -> configure.jwt(Customizer.withDefaults()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)

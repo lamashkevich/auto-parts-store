@@ -11,10 +11,11 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain filterChain(ServerHttpSecurity http) throws Exception {
+    public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(ex -> ex
                         .pathMatchers("/api-docs/**", "/webjars/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(configurer -> configurer.jwt(Customizer.withDefaults()))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
