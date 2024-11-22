@@ -1,0 +1,7 @@
+CREATE TABLE products (
+    id SERIAL NOT NULL PRIMARY KEY,
+    code VARCHAR(32) NOT NULL,
+    brand VARCHAR(32) NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    description VARCHAR(255) NOT NULL
+);
