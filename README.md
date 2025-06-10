@@ -3,7 +3,6 @@
 
 Application for automation of auto parts store.
 
----
 ## Project Status
 🚧 **Alpha Development**  
 This is an early-stage project with the following limitations:
@@ -12,7 +11,6 @@ This is an early-stage project with the following limitations:
 - Limited test coverage
 - Documentation in progress
 
----
 ## Technologies
 - Java 21
 - Spring Boot 3.3
@@ -25,11 +23,9 @@ This is an early-stage project with the following limitations:
 - Kafka
 - Keycloak
 
----
 ## License
 Distributed under the GNU General Public License. See `LICENSE` for more information.
 
----
 ## Contacts
 - Yauheni Lamashkevich - [@lamashkevich](https://github.com/lamashkevich)
 - Project Link: [https://github.com/lamashkevich/auto-parts-store](https://github.com/lamashkevich/auto-parts-store)
